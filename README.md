@@ -109,5 +109,5 @@ Each entry is a Unicode code point.
 
 ## Related projects / file formats
 
- - https://github.com/dylanaraps/pxltrm
- - https://en.wikipedia.org/wiki/Netpbm#File_formats
+ - [pxltrm](https://github.com/dylanaraps/pxltrm)
+ - [Netpbm file format](https://en.wikipedia.org/wiki/Netpbm#File_formats)
