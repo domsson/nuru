@@ -25,7 +25,7 @@ The payload is a list of image cells, in row-major order, that describes
 the character, foreground and background color for that cell, plus optional 
 meta data.
 
-Fields larger than 1 byte are encoded using little endian byte order. 
+Fields larger than 1 byte are encoded using big endian byte order. 
 
 ### NUI header (32 bytes)
 
@@ -92,7 +92,7 @@ Binary file consisting of a 16 byte header and payload of fixed length.
 The payload is simply a list of 2 byte Unicode code points that can be 
 used as the value of a `wchar_t` and therefore easily be printed.
 
-Fields larger than 1 byte are encoded using little endian byte order. 
+Fields larger than 1 byte are encoded using big endian byte order. 
 
 ### NUP header (16 bytes)
 
