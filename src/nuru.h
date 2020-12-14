@@ -5,6 +5,10 @@
 #include <stdint.h>     // uint8_t, uint16_t
 #include <string.h>     // strcmp()
 
+#ifndef NURU_SCOPE
+#  define NURU_SCOPE
+#endif
+
 // 
 // API
 // 
@@ -75,11 +79,11 @@ typedef struct nuru_pal
 }
 nuru_pal_s;
 
-int nuru_img_load(nuru_img_s *img, const char *file);
-int nuru_img_free(nuru_img_s *img);
-int nuru_pal_load(nuru_pal_s *pal, const char *file);
+NURU_SCOPE int nuru_img_load(nuru_img_s *img, const char *file);
+NURU_SCOPE int nuru_img_free(nuru_img_s *img);
+NURU_SCOPE int nuru_pal_load(nuru_pal_s *pal, const char *file);
 
-nuru_cell_s* nuru_get_cell(nuru_img_s *img, uint16_t col, uint16_t row);
+NURU_SCOPE nuru_cell_s* nuru_get_cell(nuru_img_s *img, uint16_t col, uint16_t row);
 
 // 
 // IMPLEMENTATION
@@ -87,7 +91,7 @@ nuru_cell_s* nuru_get_cell(nuru_img_s *img, uint16_t col, uint16_t row);
 
 #ifdef NURU_IMPLEMENTATION
 
-int
+NURU_SCOPE int
 nuru_img_load(nuru_img_s *img, const char *file)
 {
 	FILE *fp;
@@ -157,7 +161,7 @@ nuru_img_load(nuru_img_s *img, const char *file)
 	return img->num_cells;
 }
 
-nuru_cell_s*
+NURU_SCOPE nuru_cell_s*
 nuru_get_cell(nuru_img_s *img, uint16_t col, uint16_t row)
 {
 	size_t idx = (row * img->cols) + col;
@@ -168,7 +172,7 @@ nuru_get_cell(nuru_img_s *img, uint16_t col, uint16_t row)
 	return &img->cells[idx];
 }
 
-int
+NURU_SCOPE int
 nuru_img_free(nuru_img_s *img)
 {
 	if (!img)
@@ -185,7 +189,7 @@ nuru_img_free(nuru_img_s *img)
 	return 0;
 }
 
-int
+NURU_SCOPE int
 nuru_pal_load(nuru_pal_s *pal, const char *file)
 {
 	FILE *fp;
