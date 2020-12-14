@@ -6,6 +6,10 @@ characters and, optionally, 4 or 8 bit colors via ANSI escape sequences.
 Additionally, a header-only C file is provided that provides some basic 
 data structures and functions for handling nuru files. 
 
+## Status
+
+Rather early work-in-progress. Do not use yet. Especially the code. 
+
 ## Files
 
 Two file formats are being introduced;
