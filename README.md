@@ -76,7 +76,7 @@ Meta data mode:
 ### Default colors
 
 The default colors allow an application to make use of a terminal's default 
-foreground and/ or background color when displaying a cell. This is being done  
+foreground and/ or background color when displaying a cell. This is being done 
 by sacrificying two colors, one for each channel, to signify "no color". 
 
 In 8-bit color mode, colors `0` (`#000`, black) and `15` (`#fff`, white) are 
