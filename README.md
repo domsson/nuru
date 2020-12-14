@@ -3,8 +3,8 @@
 nuru is a file format specification for terminal drawings using Unicode 
 characters and, optionally, 4 or 8 bit colors via ANSI escape sequences.
 
-Additionally, a header-only C file is provided that provides some basic 
-data structures and functions for handling nuru files. 
+Additionally, a header-only C file provides some basic data structures 
+and functions for handling nuru files. 
 
 ## Status
 
