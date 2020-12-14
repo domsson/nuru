@@ -41,7 +41,6 @@ Fields larger than 1 byte are encoded using little endian byte order.
  - `17` - `23`: Name of the palette originally used to create the image (7 bytes, char) 
  - `24` - `30`: Free to use (author signature) (7 bytes, char)
  - `31`: Reserved (1 byte)
- - `32`+: Cell data
 
 ### NUI payload (cell data)
 
@@ -95,15 +94,14 @@ used as the value of a `wchar_t` and therefore easily be printed.
 
 Fields larger than 1 byte are encoded using little endian byte order. 
 
-### NUP header
+### NUP header (16 bytes)
 
  - `00` - `06`: `NURUPAL` (7 bytes, char)
  - `07`: File format version as integer (1 byte, uint8\_t)
  - `08`: Index of default fill character (usually space) (1 byte, uint8\_t)
  - `09` - `15`: Name of the palette (7 bytes, char)
- - `16` - `527`: 255 characters as 16 bit Unicode code points (512 bytes, uint16\_t)
 
-### NUP payload (characters)
+### NUP payload (characters, 256 bytes)
 
 	codepoint0 ... codepoint255
 
