@@ -29,7 +29,7 @@ Fields larger than 1 byte are encoded using big endian byte order.
 
 ### NUI header (32 bytes)
 
- - `00` - `06`: File signature `68 61 6b 6f` (`NURUIMG`) (7 bytes, char)
+ - `00` - `06`: File signature `4E 55 52 55 49 4D 47` (`NURUIMG`) (7 bytes, char)
  - `07`: File version (1 byte, uint8\_t)
  - `08`: Glyph mode (1 byte, uint8\_t)
  - `09`: Color mode (1 byte, uint8\_t)
@@ -96,7 +96,7 @@ Fields larger than 1 byte are encoded using big endian byte order.
 
 ### NUP header (16 bytes)
 
- - `00` - `06`: `NURUPAL` (7 bytes, char)
+ - `00` - `06`: `4E 55 52 55 50 41 4C` (`NURUPAL`) (7 bytes, char)
  - `07`: File format version as integer (1 byte, uint8\_t)
  - `08`: Index of default fill character (usually space) (1 byte, uint8\_t)
  - `09` - `15`: Name of the palette (7 bytes, char)
