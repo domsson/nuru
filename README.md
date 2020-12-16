@@ -56,7 +56,7 @@ Glyph mode:
 
  - `0`: 0 bits, print spaces only (can be used with background color)
  - `1`: 8 bits, 256 characters as indices into a character palette\*
- - `2`: 16 bits, directly using Unicode code points (only 2 byte code points, obviously)
+ - `2`: 16 bits, directly using Unicode code points (Plane 0, Basic Multilingual Plane)
 
 \*) If the palette is `default`, then the first 256 Unicode code points shall be used instead. 
     This allows creation and distribution of files without the need for a palette file.
