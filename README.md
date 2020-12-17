@@ -6,6 +6,8 @@ characters and, optionally, 4 or 8 bit colors via ANSI escape sequences.
 Additionally, a header-only C file provides some basic data structures 
 and functions for handling nuru files. 
 
+A work-in-progress nuru image web editor is available: [nuru-web](https://github.com/domsson/nuru-web/)
+
 ## Status
 
 Rather early work-in-progress. Do not use yet. Especially the code. 
