@@ -1,9 +1,9 @@
 # nuru
 
 nuru is a file format specification for terminal drawings using Unicode 
-characters and, optionally, 4 or 8 bit colors via ANSI escape sequences.
+characters and, optionally, colors via ANSI escape sequences or RGB. 
 
-nuru uses to files, an image file and an (optional) glyph palette file.
+nuru uses two files, an image file and an (optional) glyph palette file.
 
 This repository contains the file format descriptions and a header-only 
 C file providing data structures and functions for handling nuru files. 
