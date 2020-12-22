@@ -53,12 +53,20 @@ meta data.
 | `24`   | comment     | 7      | `char`     | Free to use (for example, author signature) |
 | `31`   | reserved    | 1      |  n/a       | Currently not in used, should be left empty |
 
-The key colors allow an application to make use of a terminal's default 
-foreground and/ or background color when displaying a cell. This is being done 
-by sacrificying two colors, one for each channel, to signify "no color". 
+The `fg_key` and `bg_key` fields allow an application to make use of a 
+terminal's default foreground and/ or background color when displaying a cell. 
+This is being done by sacrificying two colors, one for each channel, to signify 
+"no color". This allows for transparency when displaying or combining images. 
 
 In 8-bit color mode, colors `0` (`#000`, black) and `15` (`#fff`, white) are 
 recommended, as they both exist twice (`16` and `231`).
+
+The `glyph_mode`, `color_mode` and `mdata_mode` values were designed in a way 
+that they can be directly used as buffer size for the buffers that are used to 
+store the respective values from the cell data.
+
+The `palette` field is case insensitive, so applications should either convert 
+to lower or upper case before comparing it against available palette files.
 
 ### NUI payload (cell data)
 
