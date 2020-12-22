@@ -145,8 +145,10 @@ Each entry is a Unicode code point from the basic multilingual plane.
 
 This alternative version has the benefit of being the same size as the NUI 
 header, and the fields that have the same meaning are aligned at the same 
-offsets, which makes for easier reading and writing implementations at the 
-cost of 16 bytes per palette file. Worth it?
+offsets, which makes for easier reading and writing implementations. More 
+importantly, however, this header allows for palettes to be used for other 
+purposes than just glyphs, namely color palettes. It all comes at the cost 
+of 16 additional bytes per palette file. Worth it?
 
 | offset | field       | length | type       | description                       |
 |--------|-------------|--------|------------|-----------------------------------|
