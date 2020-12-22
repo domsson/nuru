@@ -67,7 +67,7 @@ of each entry depend on `glyph_mode`, `color_mode` and `mdata_mode`.
 
 	[[glyph] [color] [mdata]] [...]
 
-#### Glyph
+#### Cell data: glyph
 
 Defines the glyph to be used for a cell. The length and interpretation of the 
 data depends on the `glyph_mode`:
@@ -84,7 +84,7 @@ then the palette is assumed to be the first 256 Unicode code points (extended
 ASCII). This allows for the distribution of simple ASCII art images without 
 the need to ship a glyph palette at all.
 
-#### Color
+#### Cell data: color
 
 Defines the foreground and background color data for a cell. The length and 
 interpretation of the data depends on the `color_mode`:
@@ -106,7 +106,7 @@ the current field design, where the mode fields can directly be used as the
 buffer size for the respective data. If this was to be implemented, the NUP 
 format would need to use the alternatively suggested 32 bit header (see below).
 
-#### Mdata
+#### Cell data: mdata
 
 Defines the meta data for a cell. The length of the data depends on the 
 `mdata_mode` field, the interpretation is outside the scope of nuru:
