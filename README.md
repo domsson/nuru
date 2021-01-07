@@ -102,7 +102,7 @@ interpretation of the data depends on the `color_mode`:
 | 0           | 0      | n/a          | No colors, the image is monochrome (requires a `glyph_mode` other than `0`) |
 | 1           | 1      | `uint8_t`    | 4 bit ANSI colors; high nibble is foreground, low nibble is background color |
 | 2           | 2      | 2× `uint8_t` | 8 bit ANSI colors; high byte is foreground, low byte is background color |
-| 3           | 3      | 2× `uint8_t` | RGB colors; R, G and B channels in that order |
+| 3           | 3      | 3× `uint8_t` | RGB colors; R, G and B channels in that order |
 
  - For `1`, see [4-bit ANSI color](https://en.wikipedia.org/wiki/ANSI_escape_code#3-bit_and_4-bit) (30 = 0, 31 = 1, ... 97 = 15)
  - For `2`, see [8-bit ANSI color](https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit)
