@@ -1,21 +1,26 @@
 # nuru
 
-nuru is a file format specification for terminal drawings using Unicode 
-characters and, optionally, colors via ANSI escape sequences or RGB. 
+nuru is a file format specification for terminal drawings using ASCII or 
+Unicode characters and, optionally, colors via ANSI escape sequences or RGB. 
+It can therefore handle a multitude of ANSI and ASCII art. 
 
-nuru uses two files, an image file and an (optional) glyph palette file.
+nuru uses two types of files, image files and optional palette files.
+Palette files can contain either glyphs (characters) or colors. This enables
+the emulation of code pages and allows for color palette swapping.
 
-This repository contains the file format descriptions and a header-only 
-C file providing data structures and functions for handling nuru files. 
+Images can further contain meta data for each cell. This makes the format
+suitable for use in a variety of projects, including games.
 
-A work-in-progress nuru image web editor is also available: 
+This repository contains the file format descriptions and a header-only
+C file providing data structures and functions for handling nuru files.
+
+A work-in-progress nuru image web editor is also available:
 [nuru-web](https://github.com/domsson/nuru-web/)
 
 ## Status
 
 This is still a work in progress. Once the formats are final for their 
-initial version (1), I'll update this space to let you know. Most likely, 
-the NUI format is final, but I'm still undecided on the NUP header format.
+initial version (1), I'll update this space to let you know.
 
 ## Files
 
@@ -49,9 +54,9 @@ meta data.
 | `13`   | height      | 2      | `uint16_t` | Image height (number of rows) | 
 | `15`   | fg\_key     | 1      | `uint8_t`  | Default/key foreground color |
 | `16`   | bg\_key     | 1      | `uint8_t`  | Default/key background color |
-| `17`   | palette     | 7      | `char`     | Name of the palette intended to be used for this image |
-| `24`   | comment     | 7      | `char`     | Free to use (for example, author signature) |
-| `31`   | reserved    | 1      |  n/a       | Currently not in used, should be left empty |
+| `17`   | glyph\_pal  | 7      | `char`     | Name of the glyph palette to be used for this image |
+| `24`   | color\_pal  | 7      | `char`     | Name of the color palette to be used for this image |
+| `31`   | reserved    | 1      |  n/a       | Currently not in use, reserved for future extensions |
 
 The `fg_key` and `bg_key` fields allow an application to make use of a 
 terminal's default foreground and/ or background color when displaying a cell. 
@@ -83,36 +88,34 @@ data depends on the `glyph_mode`:
 | glyph\_mode | length | type       | description                              |
 |-------------|--------|------------|------------------------------------------|
 | 0           | 0      | n/a        | No glpyhs, the image only uses the space character (requires a `color_mode` other than `0`) |
-| 1           | 1      | `uint8_t`  | Index into a glyph palette |
+| 1           | 1      | `uint8_t`  | ASCII char code *or* index into glyph palette |
 | 2           | 2      | `uint16_t` | Unicode code point into the Basic Multilingual Plane (Plane 0) |
-| 3           | 3      | `uint32_t` | Unicode code point into any Plane (not recommended) |
 
-If `glyph_mode` is `1` and the `palette` name is set to `ASCII` (or `ascii`), 
-then the palette is assumed to be the first 256 Unicode code points (extended 
-ASCII). This allows for the distribution of simple ASCII art images without 
-the need to ship a glyph palette at all.
+If `glyph_mode` is set to `1` and `glyph_pal` is set, then the value is to be 
+interpreted as an index into the glyph palette. However, if `glpyh_pal` is 
+empty, then the value is simply an ASCII char code (Unicode extended ASCII).
+
+The correlation of `glyph_mode` and the `length` is intentional.
 
 #### Cell data: color
 
 Defines the foreground and background color data for a cell. The length and 
 interpretation of the data depends on the `color_mode`:
 
-| color\_mode | length | type         | description                           |
-|-------------|--------|--------------|---------------------------------------|
+| color\_mode | length | type         | description                            |
+|-------------|--------|--------------|----------------------------------------|
 | 0           | 0      | n/a          | No colors, the image is monochrome (requires a `glyph_mode` other than `0`) |
 | 1           | 1      | `uint8_t`    | 4 bit ANSI colors; high nibble is foreground, low nibble is background color |
 | 2           | 2      | 2× `uint8_t` | 8 bit ANSI colors; high byte is foreground, low byte is background color |
-| 3           | 3      | 3× `uint8_t` | RGB colors; R, G and B channels in that order |
 
- - For `1`, see [4-bit ANSI color](https://en.wikipedia.org/wiki/ANSI_escape_code#3-bit_and_4-bit) (30 = 0, 31 = 1, ... 97 = 15)
+ - For `1`, see [4-bit ANSI color](https://en.wikipedia.org/wiki/ANSI_escape_code#3-bit_and_4-bit) (0 => 30, 1 => 31, ... 15 => 97)
  - For `2`, see [8-bit ANSI color](https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit)
 
-A possible future expansion would be to allow for the use of color palettes, 
-similar to glyph palettes. This would allow using RGB colors, but limit the 
-selection of colors to a limited set. The only issue is that this would break 
-the current field design, where the mode fields can directly be used as the 
-buffer size for the respective data. If this was to be implemented, the NUP 
-format would need to use the alternatively suggested 32 bit header (see below).
+If `color_mode` is set to `2` and `color_pal` is set, then the values are to be 
+interpreted as indices into the color palette. However, if `color_pal` is empty, 
+then the values are to be interpreted as 8 bit ANSI color codes. 
+
+The correlation of `color_mode` and the `length` is intentional.
 
 #### Cell data: mdata
 
@@ -123,55 +126,46 @@ Defines the meta data for a cell. The length of the data depends on the
 |-------------|--------|------------|------------------------------------------|
 | 0           | 0      | n/a        | No meta data                             |
 | 1           | 1      | n/a        | 1 byte of meta data                      |
-| 2           | 2      | n/a        | 2 byte of meta data                      |
-| 3           | 3      | n/a        | 3 byte of meta data                      |
+| 2           | 2      | n/a        | 2 bytes of meta data                     |
+
+The correlation of `mdata_mode` and the `length` is intentional.
 
 ## NUP - nuru palette file
 
-Describes a glyph palette, i.e. the characters to be used in a nuru image.
-16 byte header and payload of fixed length. 
+Describes a glyph or color palette, i.e. the characters or colors to be used 
+in a nuru image. 16 byte header and payload of fixed length (256 entries). 
 
-The payload is simply a list of 2 byte Unicode code points that can be 
-used as the value of a `wchar_t` and therefore easily be printed.
+### NUP header (16 bytes)
 
-### NUP header (current implementation, 16 bytes)
+| offset | field     | length | type      | description                        |
+|--------|-----------|--------|-----------|------------------------------------|
+| `00`   | signature | 7      | `char`    | File format signature `4E 55 52 55 50 41 4C` (`NURUPAL`) |
+| `07`   | version   | 1      | `uint8_t` | File format version                |
+| `08`   | type      | 1      | `uint8_t` | Palette type, see below            |
+| `09`   | default1  | 1      | `uint8_t` | Index of default glyph (usually space) or foreground color |
+| `10`   | default2  | 1      | `uint8_t` | Index of default background color  | 
+| `11`   | context   | 4      | n/a       | Free to use                        |
+| `12`   | reserved  | 1      | n/a       | Currently not in use, reserved for future extensions |
 
-| offset | field       | length | type       | description                       |
-|--------|-------------|--------|------------|-----------------------------------|
-| `00`   | signature   | 7      | `char`     | File format signature `4E 55 52 55 50 41 4C` (`NURUPAL`) |
-| `07`   | version     | 1      | `uint8_t`  | File format version |
-| `08`   | default     | 1      | `uint8_t`  | Default element (usually points to the space character) |
-| `09`   | name        | 7      | `char`     | Name of the palette |
+### NUP payload (256 or 512 or 768 bytes)
 
-### NUP payload (characters, 256 bytes)
+	entry0 ... entry255
 
-	codepoint0 ... codepoint255
+Size and interpretation of each entry depends on the palette `type`, see below. 
+There are always 256 entries, therefore the total payload size is `256 * type`.
 
-Each entry is a Unicode code point from the basic multilingual plane.
+#### Palette type and entry data
 
-### NUP header (alternative proposal, 32 bytes)
+The palette type determines not only whether the palette is a glyph or color 
+palette, but also the size and interpretation of each entry within the palette:
 
-This alternative version has the benefit of being the same size as the NUI 
-header, and the fields that have the same meaning are aligned at the same 
-offsets, which makes for easier reading and writing implementations. More 
-importantly, however, this header allows for palettes to be used for other 
-purposes than just glyphs, namely color palettes. It all comes at the cost 
-of 16 additional bytes per palette file. Worth it?
+| type | palette | entry size | entry interpretation                           |
+|------|---------|------------|------------------------------------------------|
+| 1    | colors  | 1          | 8 bit ANSI color                               |
+| 2    | glyphs  | 2          | Unicode code point into the Basic Multilingual Plane (Plane 0) |
+| 3    | colors  | 3          | RGB color (R, G and B channels in that order)  |
 
-| offset | field       | length | type       | description                       |
-|--------|-------------|--------|------------|-----------------------------------|
-| `00`   | signature   | 7      | `char`     | File format signature `4E 55 52 55 50 41 4C` (`NURUPAL`) |
-| `07`   | version     | 1      | `uint8_t`  | File format version |
-| `08`   | type        | 1      | `uint8_t`  | Palette type (glyphs, colors) | 
-| `09`   | mode        | 1      | `uint8_t`  | Palette mode (usually size of each entry) |
-| `10`   | reserved    | 1      |  n/a       | Currently not in use, should be left empty |
-| `11`   | length      | 2      | `uint16_t` | Number of entries in the payload |
-| `13`   | depth       | 2      | `uint16_t` | Always `1` so that `length*depth` is the number of entries in the payload |
-| `15`   | default1    | 1      | `uint8_t`  | Primary default entry (e.g. index of space character) |
-| `16`   | default2    | 1      | `uint8_t`  | Secondary default entry (e.g. recommended background color) |
-| `17`   | name        | 7      | `char`     | Name of the palette |
-| `24`   | comment     | 7      | `char`     | Free to use (for example, author signature) |
-| `31`   | reserved    | 1      |  n/a       | Currently not in use, should be left empty |
+The correlation of `type` and the entry size is intentional.
 
 ## Related projects / file formats
 
