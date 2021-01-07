@@ -83,11 +83,11 @@ data depends on the `glyph_mode`:
 | glyph\_mode | length | type       | description                              |
 |-------------|--------|------------|------------------------------------------|
 | 0           | 0      | n/a        | No glpyhs, the image only uses the space character (requires a `color_mode` other than `0`) |
-| 1           | 1      | `uint8_t`  | Index into a glyph palette, unless palette name is `default` |
+| 1           | 1      | `uint8_t`  | Index into a glyph palette |
 | 2           | 2      | `uint16_t` | Unicode code point into the Basic Multilingual Plane (Plane 0) |
 | 3           | 3      | `uint32_t` | Unicode code point into any Plane (not recommended) |
 
-If the `palette` field is set to `default` or `ASCII` and `glyph_mode` is `1`, 
+If `glyph_mode` is `1` and the `palette` name is set to `ASCII` (or `ascii`), 
 then the palette is assumed to be the first 256 Unicode code points (extended 
 ASCII). This allows for the distribution of simple ASCII art images without 
 the need to ship a glyph palette at all.
