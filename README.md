@@ -50,8 +50,8 @@ meta data.
 | `08`   | glyph\_mode | 1      | `uint8_t`  | Glyph mode | 
 | `09`   | color\_mode | 1      | `uint8_t`  | Color mode |
 | `10`   | mdata\_mode | 1      | `uint8_t`  | Meta data mode |
-| `11`   | width       | 2      | `uint16_t` | Image width (number of columns) |
-| `13`   | height      | 2      | `uint16_t` | Image height (number of rows) | 
+| `11`   | cols        | 2      | `uint16_t` | Image width (number of columns) |
+| `13`   | rows        | 2      | `uint16_t` | Image height (number of rows) | 
 | `15`   | fg\_key     | 1      | `uint8_t`  | Default/key foreground color |
 | `16`   | bg\_key     | 1      | `uint8_t`  | Default/key background color |
 | `17`   | glyph\_pal  | 7      | `char`     | Name of the glyph palette to be used for this image |
@@ -92,10 +92,6 @@ data depends on the `glyph_mode`:
 | 2           | 2      | `uint16_t` | Unicode code point into the Basic Multilingual Plane (Plane 0) |
 | 129         | 1      | `uint8_t`  | Index into glyph palette                 |
 
-If `glyph_mode` is set to `1` and `glyph_pal` is set, then the value is to be 
-interpreted as an index into the glyph palette. However, if `glpyh_pal` is 
-empty, then the value is simply an ASCII char code (Unicode extended ASCII).
-
 The correlation of `glyph_mode` and the `length` is intentional.
 This also works for the palette mode if one subtracts 128 from it. 
 In other words, the highest bit, if set, indicates palette mode.
@@ -108,16 +104,12 @@ interpretation of the data depends on the `color_mode`:
 | color\_mode | length | type       | description                              |
 |-------------|--------|------------|------------------------------------------|
 | 0           | 0      | n/a        | No colors, the image is monochrome (requires a `glyph_mode` other than `0`) |
-| 1           | 1      | `uint8_t`  | 4 bit ANSI colors; high nibble is foreground, low nibble is background color |
-| 2           | 2      | `uint16_t` | 8 bit ANSI colors; high byte is foreground, low byte is background color |
+| 1           | 1      | `uint8_t`  | 4 bit ANSI colors; high nibble is foreground, low nibble is background |
+| 2           | 2      | `uint16_t` | 8 bit ANSI colors; high byte is foreground, low byte is background |
 | 130         | 2      | `uint16_t` | Indices into color palette; high byte is foreground, low byte is background | 
 
  - For `1`, see [4-bit ANSI color](https://en.wikipedia.org/wiki/ANSI_escape_code#3-bit_and_4-bit) (0 => 30, 1 => 31, ... 15 => 97)
  - For `2`, see [8-bit ANSI color](https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit)
-
-If `color_mode` is set to `2` and `color_pal` is set, then the values are to be 
-interpreted as indices into the color palette. However, if `color_pal` is empty, 
-then the values are to be interpreted as 8 bit ANSI color codes. 
 
 The correlation of `color_mode` and the `length` is intentional.
 This also works for the palette mode if one subtracts 128 from it. 
