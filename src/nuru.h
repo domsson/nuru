@@ -4,6 +4,7 @@
 #include <stdio.h>      // size_t, fopen()
 #include <stdint.h>     // uint8_t, uint16_t
 #include <string.h>     // strcmp()
+#include <ctype.h>      // isalnum()
 #include <arpa/inet.h>  // ntohs()
 
 #define NURU_NAME "nuru"
@@ -109,7 +110,7 @@ typedef struct nuru_pal
 	uint8_t  type;
 	uint8_t  default1;
 	uint8_t  default2;
-	uint32_t userdata; // or char[4]? what's better?
+	char     userdata[4];
 	uint8_t  reserved;
 
 	uint16_t codepoints[NURU_PAL_SIZE];
@@ -216,8 +217,8 @@ nuru_img_load(nuru_img_s* img, const char* file)
 	success += nuru_read_str(img->color_pal, NURU_STR_LEN_RAW, fp);
 	success += nuru_read_int(&img->reserved, 1, fp);
 
-	int glyph_mode = img->glyph_mode * (-1 * (img->glyph_pal[0] != 0));
-	int color_mode = img->color_mode * (-1 * (img->color_pal[0] != 0));
+	int glyph_mode = img->glyph_mode * (-1 * isalnum(img->glyph_pal[0]));
+	int color_mode = img->color_mode * (-1 * isalnum(img->color_pal[0]));
 
 	if (success != 0)
 	{
@@ -354,8 +355,11 @@ nuru_pal_load(nuru_pal_s* pal, const char* file)
 
 	// read rest of header
 	success += nuru_read_int(&pal->version, 1, fp);
-	success += nuru_read_int(&pal->space, 1, fp);
-	success += nuru_read_str(pal->name, NURU_STR_LEN_RAW, fp);
+	success += nuru_read_int(&pal->type, 1, fp);
+	success += nuru_read_int(&pal->default1, 1, fp);
+	success += nuru_read_int(&pal->default2, 1, fp);
+	success += nuru_read_str(pal->userdata, 4, fp);
+	success += nuru_read_int(&pal->reserved, 1, fp);
 
 	if (success != 0)
 	{
