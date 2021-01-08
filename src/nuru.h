@@ -41,19 +41,19 @@
 
 typedef enum nuru_glyph_mode
 {
-	NURU_GLYPH_MODE_PALETTE = -1, // using a palette file
-	NURU_GLYPH_MODE_NONE    =  0, // spaces only (needs a color mode)
-	NURU_GLYPH_MODE_ASCII   =  1, // ASCII
-	NURU_GLYPH_MODE_UNICODE =  2  // directly using 16 bit code points
+	NURU_GLYPH_MODE_NONE    = 0,  // spaces only (needs a color mode)
+	NURU_GLYPH_MODE_ASCII   = 1,  // ASCII
+	NURU_GLYPH_MODE_UNICODE = 2,  // directly using 16 bit code points
+	NURU_GLYPH_MODE_PALETTE = 129 // using a palette file
 }
 nuru_glyph_mode_e;
 
 typedef enum nuru_color_mode
 {
-	NURU_COLOR_MODE_PALETTE = -2, // using a palette file
-	NURU_COLOR_MODE_NONE    =  0, // no colors, monochrome
-	NURU_COLOR_MODE_4BIT    =  1, // 4-bit ANSI colors
-	NURU_COLOR_MODE_8BIT    =  2  // 8-bit ANSI colors or using a palette file
+	NURU_COLOR_MODE_NONE    = 0,  // no colors, monochrome
+	NURU_COLOR_MODE_4BIT    = 1,  // 4-bit ANSI colors
+	NURU_COLOR_MODE_8BIT    = 2,  // 8-bit ANSI colors or using a palette file
+	NURU_COLOR_MODE_PALETTE = 130 // using a palette file
 }
 nuru_color_mode_e;
 
@@ -217,9 +217,6 @@ nuru_img_load(nuru_img_s* img, const char* file)
 	success += nuru_read_str(img->color_pal, NURU_STR_LEN_RAW, fp);
 	success += nuru_read_int(&img->reserved, 1, fp);
 
-	int glyph_mode = img->glyph_mode * (-1 * isalnum(img->glyph_pal[0]));
-	int color_mode = img->color_mode * (-1 * isalnum(img->color_pal[0]));
-
 	if (success != 0)
 	{
 		fclose(fp);
@@ -237,13 +234,13 @@ nuru_img_load(nuru_img_s* img, const char* file)
 
 	for (size_t c = 0; c < img->num_cells; ++c)
 	{
-		switch (glyph_mode)
+		switch (img->glyph_mode)
 		{
 			case NURU_GLYPH_MODE_NONE:
 				img->cells[c].ch = NURU_SPACE;
 				break;
-			case NURU_GLYPH_MODE_PALETTE:
 			case NURU_GLYPH_MODE_ASCII:
+			case NURU_GLYPH_MODE_PALETTE:
 				success += nuru_read_int(&img->cells[c].ch, 1, fp);
 				break;
 			case NURU_GLYPH_MODE_UNICODE:
@@ -254,7 +251,7 @@ nuru_img_load(nuru_img_s* img, const char* file)
 				return NURU_ERR_FILE_MODE;
 		}
 
-		switch(color_mode)
+		switch(img->color_mode)
 		{
 			case NURU_COLOR_MODE_NONE:
 				img->cells[c].fg = 0;
@@ -263,8 +260,8 @@ nuru_img_load(nuru_img_s* img, const char* file)
 			case NURU_COLOR_MODE_4BIT:
 				success += nuru_read_col(&img->cells[c].fg, &img->cells[c].bg, fp);
 				break;
-			case NURU_COLOR_MODE_PALETTE:
 			case NURU_COLOR_MODE_8BIT:
+			case NURU_COLOR_MODE_PALETTE:
 				success += nuru_read_int(&img->cells[c].fg, 1, fp);
 				success += nuru_read_int(&img->cells[c].bg, 1, fp);
 				break;
