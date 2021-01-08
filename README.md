@@ -5,11 +5,11 @@ Unicode characters and, optionally, colors via ANSI escape sequences or RGB.
 It can therefore handle a multitude of ANSI and ASCII art. 
 
 nuru uses two types of files, image files and optional palette files.
-Palette files can contain either glyphs (characters) or colors. This enables
-the emulation of code pages and allows for color palette swapping.
+Palette files can contain glyphs (characters) or colors. This enables the 
+emulation of code pages and allows for color palette swapping.
 
 Images can further contain meta data for each cell. This makes the format
-suitable for use in a variety of projects, including games.
+suitable for use in a variety of projects, including terminal games.
 
 This repository contains the file format descriptions and a header-only
 C file providing data structures and functions for handling nuru files.
@@ -102,11 +102,11 @@ The correlation of `glyph_mode` and the `length` is intentional.
 Defines the foreground and background color data for a cell. The length and 
 interpretation of the data depends on the `color_mode`:
 
-| color\_mode | length | type         | description                            |
-|-------------|--------|--------------|----------------------------------------|
-| 0           | 0      | n/a          | No colors, the image is monochrome (requires a `glyph_mode` other than `0`) |
-| 1           | 1      | `uint8_t`    | 4 bit ANSI colors; high nibble is foreground, low nibble is background color |
-| 2           | 2      | 2× `uint8_t` | 8 bit ANSI colors; high byte is foreground, low byte is background color |
+| color\_mode | length | type       | description                              |
+|-------------|--------|------------|------------------------------------------|
+| 0           | 0      | n/a        | No colors, the image is monochrome (requires a `glyph_mode` other than `0`) |
+| 1           | 1      | `uint8_t`  | 4 bit ANSI colors; high nibble is foreground, low nibble is background color |
+| 2           | 2      | `uint16_t` | 8 bit ANSI colors; high byte is foreground, low byte is background color |
 
  - For `1`, see [4-bit ANSI color](https://en.wikipedia.org/wiki/ANSI_escape_code#3-bit_and_4-bit) (0 => 30, 1 => 31, ... 15 => 97)
  - For `2`, see [8-bit ANSI color](https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit)
@@ -144,8 +144,8 @@ in a nuru image. 16 byte header and payload of fixed length (256 entries).
 | `08`   | type      | 1      | `uint8_t` | Palette type, see below            |
 | `09`   | default1  | 1      | `uint8_t` | Index of default glyph (usually space) or foreground color |
 | `10`   | default2  | 1      | `uint8_t` | Index of default background color  | 
-| `11`   | context   | 4      | n/a       | Free to use                        |
-| `12`   | reserved  | 1      | n/a       | Currently not in use, reserved for future extensions |
+| `11`   | userdata  | 4      | n/a       | Free to use                        |
+| `15`   | reserved  | 1      | n/a       | Currently not in use, reserved for future extensions |
 
 ### NUP payload (256 or 512 or 768 bytes)
 

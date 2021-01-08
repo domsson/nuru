@@ -40,17 +40,19 @@
 
 typedef enum nuru_glyph_mode
 {
-	NURU_GLYPH_MODE_NONE    = 0,  // spaces only (needs a color mode)
-	NURU_GLYPH_MODE_PALETTE = 1,  // using a 255 char palette file
-	NURU_GLYPH_MODE_UNICODE = 2   // directly using 16 bit code points
+	NURU_GLYPH_MODE_PALETTE = -1, // using a palette file
+	NURU_GLYPH_MODE_NONE    =  0, // spaces only (needs a color mode)
+	NURU_GLYPH_MODE_ASCII   =  1, // ASCII
+	NURU_GLYPH_MODE_UNICODE =  2  // directly using 16 bit code points
 }
 nuru_glyph_mode_e;
 
 typedef enum nuru_color_mode
 {
-	NURU_COLOR_MODE_NONE = 0,     // no colors, monochrome
-	NURU_COLOR_MODE_4BIT = 1,     // 4-bit ANSI colors
-	NURU_COLOR_MODE_8BIT = 2      // 8-bit ANSI colors
+	NURU_COLOR_MODE_PALETTE = -2, // using a palette file
+	NURU_COLOR_MODE_NONE    =  0, // no colors, monochrome
+	NURU_COLOR_MODE_4BIT    =  1, // 4-bit ANSI colors
+	NURU_COLOR_MODE_8BIT    =  2  // 8-bit ANSI colors or using a palette file
 }
 nuru_color_mode_e;
 
@@ -61,6 +63,15 @@ typedef enum nuru_mdata_mode
 	NURU_MDATA_MODE_2BYTE = 2     // 2 byte of meta data per cell
 }
 nuru_mdata_mode_e;
+
+typedef enum nuru_pal_type
+{
+	NURU_PAL_TYPE_NONE          = 0, // unknown/unset
+	NURU_PAL_TYPE_COLOR_8BIT    = 1, // color palette, 8-bit ANSI colors
+	NURU_PAL_TYPE_GLYPH_UNICODE = 2, // glyph palette, unicode code points
+	NURU_PAL_TYPE_COLOR_RGB     = 3, // color palette, RGB colors
+}
+nuru_pal_type_e;
 
 typedef struct nuru_cell
 {
@@ -80,10 +91,10 @@ typedef struct nuru_img
 	uint8_t  mdata_mode;
 	uint16_t cols;
 	uint16_t rows;
-	uint8_t  fg;
-	uint8_t  bg;
-	char     palette[NURU_STR_LEN];
-	char     comment[NURU_STR_LEN];
+	uint8_t  fg_key;
+	uint8_t  bg_key;
+	char     glyph_pal[NURU_STR_LEN];
+	char     color_pal[NURU_STR_LEN];
 	uint8_t  reserved;
 
 	nuru_cell_s *cells;
@@ -93,10 +104,13 @@ nuru_img_s;
 
 typedef struct nuru_pal
 {
-	char    signature[NURU_STR_LEN];
-	uint8_t version;
-	uint8_t space;
-	char    name[NURU_STR_LEN];
+	char     signature[NURU_STR_LEN];
+	uint8_t  version;
+	uint8_t  type;
+	uint8_t  default1;
+	uint8_t  default2;
+	uint32_t userdata; // or char[4]? what's better?
+	uint8_t  reserved;
 
 	uint16_t codepoints[NURU_PAL_SIZE];
 }
@@ -196,11 +210,14 @@ nuru_img_load(nuru_img_s* img, const char* file)
 	success += nuru_read_int(&img->mdata_mode, 1, fp);
 	success += nuru_read_int(&img->cols, 2, fp);
 	success += nuru_read_int(&img->rows, 2, fp);
-	success += nuru_read_int(&img->fg, 1, fp);
-	success += nuru_read_int(&img->bg, 1, fp);
-	success += nuru_read_str(img->palette, NURU_STR_LEN_RAW, fp);
-	success += nuru_read_str(img->comment, NURU_STR_LEN_RAW, fp);
+	success += nuru_read_int(&img->fg_key, 1, fp);
+	success += nuru_read_int(&img->bg_key, 1, fp);
+	success += nuru_read_str(img->glyph_pal, NURU_STR_LEN_RAW, fp);
+	success += nuru_read_str(img->color_pal, NURU_STR_LEN_RAW, fp);
 	success += nuru_read_int(&img->reserved, 1, fp);
+
+	int glyph_mode = img->glyph_mode * (-1 * (img->glyph_pal[0] != 0));
+	int color_mode = img->color_mode * (-1 * (img->color_pal[0] != 0));
 
 	if (success != 0)
 	{
@@ -219,12 +236,13 @@ nuru_img_load(nuru_img_s* img, const char* file)
 
 	for (size_t c = 0; c < img->num_cells; ++c)
 	{
-		switch (img->glyph_mode)
+		switch (glyph_mode)
 		{
 			case NURU_GLYPH_MODE_NONE:
 				img->cells[c].ch = NURU_SPACE;
 				break;
 			case NURU_GLYPH_MODE_PALETTE:
+			case NURU_GLYPH_MODE_ASCII:
 				success += nuru_read_int(&img->cells[c].ch, 1, fp);
 				break;
 			case NURU_GLYPH_MODE_UNICODE:
@@ -235,7 +253,7 @@ nuru_img_load(nuru_img_s* img, const char* file)
 				return NURU_ERR_FILE_MODE;
 		}
 
-		switch(img->color_mode)
+		switch(color_mode)
 		{
 			case NURU_COLOR_MODE_NONE:
 				img->cells[c].fg = 0;
@@ -244,6 +262,7 @@ nuru_img_load(nuru_img_s* img, const char* file)
 			case NURU_COLOR_MODE_4BIT:
 				success += nuru_read_col(&img->cells[c].fg, &img->cells[c].bg, fp);
 				break;
+			case NURU_COLOR_MODE_PALETTE:
 			case NURU_COLOR_MODE_8BIT:
 				success += nuru_read_int(&img->cells[c].fg, 1, fp);
 				success += nuru_read_int(&img->cells[c].bg, 1, fp);
