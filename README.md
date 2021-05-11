@@ -52,9 +52,9 @@ meta data.
 | `10`   | mdata\_mode | 1      | `uint8_t`  | Meta data mode |
 | `11`   | cols        | 2      | `uint16_t` | Image width (number of columns) |
 | `13`   | rows        | 2      | `uint16_t` | Image height (number of rows) | 
-| `15`   | ch\_key     | 1      | `uint8_t`  | Key glyph |
-| `16`   | fg\_key     | 1      | `uint8_t`  | Key foreground color |
-| `17`   | bg\_key     | 1      | `uint8_t`  | Key background color |
+| `15`   | ch\_key     | 1      | `uint8_t`  | Key glyph (default: `32`) |
+| `16`   | fg\_key     | 1      | `uint8_t`  | Key foreground color (default: `15`) |
+| `17`   | bg\_key     | 1      | `uint8_t`  | Key background color (default: `0`) |
 | `18`   | glyph\_pal  | 7      | `char`     | Name of the glyph palette to be used for this image |
 | `25`   | color\_pal  | 7      | `char`     | Name of the color palette to be used for this image |
 
@@ -65,8 +65,7 @@ This is being done by sacrificying two colors, one for each channel, to signify
 
 `ch_key` points at the default glyph to be used for "no glyph", which will, 
 in the majority of the cases, be `32` (the space character). Changing this to 
-a different glyph would mean that empty areas in an image will be filled with 
-the according glyph instead of space.
+a different glyph will have nuru draw spaces whenever it encounters that char. 
 
 In 8-bit color mode, colors `0` (`#000`, black) and `15` (`#fff`, white) are 
 recommended, as they both exist twice (`16` and `231`).
