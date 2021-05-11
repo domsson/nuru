@@ -157,6 +157,10 @@ possible for an author to use a palette, but decide to deviate in their choice
 of key glyph and/or colors. Additionally, for images that do not use palettes, 
 the fields in the NUI header are required anyway.
 
+Since color palettes won't make use of the `ch_key` field, while glyph palettes 
+won't use the `fg_key` and `bg_key` field, these could be used for additional, 
+custom user data if need be.
+
 ### NUP payload (256 or 512 or 768 bytes)
 
 	entry0 ... entry255
