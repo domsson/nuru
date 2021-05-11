@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-gcc -Wall -g -o bin/nuru src/nuru.c
-

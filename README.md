@@ -52,16 +52,21 @@ meta data.
 | `10`   | mdata\_mode | 1      | `uint8_t`  | Meta data mode |
 | `11`   | cols        | 2      | `uint16_t` | Image width (number of columns) |
 | `13`   | rows        | 2      | `uint16_t` | Image height (number of rows) | 
-| `15`   | fg\_key     | 1      | `uint8_t`  | Default/key foreground color |
-| `16`   | bg\_key     | 1      | `uint8_t`  | Default/key background color |
-| `17`   | glyph\_pal  | 7      | `char`     | Name of the glyph palette to be used for this image |
-| `24`   | color\_pal  | 7      | `char`     | Name of the color palette to be used for this image |
-| `31`   | reserved    | 1      |  n/a       | Currently not in use, reserved for future extensions |
+| `15`   | ch\_key     | 1      | `uint8_t`  | Key glyph |
+| `16`   | fg\_key     | 1      | `uint8_t`  | Key foreground color |
+| `17`   | bg\_key     | 1      | `uint8_t`  | Key background color |
+| `18`   | glyph\_pal  | 7      | `char`     | Name of the glyph palette to be used for this image |
+| `25`   | color\_pal  | 7      | `char`     | Name of the color palette to be used for this image |
 
 The `fg_key` and `bg_key` fields allow an application to make use of a 
 terminal's default foreground and/ or background color when displaying a cell. 
 This is being done by sacrificying two colors, one for each channel, to signify 
 "no color". This allows for transparency when displaying or combining images. 
+
+`ch_key` points at the default glyph to be used for "no glyph", which will, 
+in the majority of the cases, be `32` (the space character). Changing this to 
+a different glyph would mean that empty areas in an image will be filled with 
+the according glyph instead of space.
 
 In 8-bit color mode, colors `0` (`#000`, black) and `15` (`#fff`, white) are 
 recommended, as they both exist twice (`16` and `231`).
@@ -140,10 +145,18 @@ in a nuru image. 16 byte header and payload of fixed length (256 entries).
 | `00`   | signature | 7      | `char`    | File format signature `4E 55 52 55 50 41 4C` (`NURUPAL`) |
 | `07`   | version   | 1      | `uint8_t` | File format version                |
 | `08`   | type      | 1      | `uint8_t` | Palette type, see below            |
-| `09`   | default1  | 1      | `uint8_t` | Index of default glyph (usually space) or foreground color |
-| `10`   | default2  | 1      | `uint8_t` | Index of default background color  | 
-| `11`   | userdata  | 4      | n/a       | Free to use                        |
-| `15`   | reserved  | 1      | n/a       | Currently not in use, reserved for future extensions |
+| `09`   | ch\_key   | 1      | `uint8_t` | Index of the key glyph (usually space) |
+| `10`   | fg\_key   | 1      | `uint8_t` | Index of the key foreground color  |
+| `11`   | bg\_key   | 1      | `uint8_t` | Index of the key background color  | 
+| `12`   | userdata  | 4      | n/a       | Free to use                        |
+
+Notice that `ch_key`, `fg_key` and `bg_key` also exist in the NUI header. 
+The idea is that a palette's header contains recommendations for key glyph 
+and key colors, so these field's values would, in most cases, be copied into 
+the NUI header. However, since the NUI header fields take precedence, it is 
+possible for an author to use a palette, but decide to deviate in their choice 
+of key glyph and/or colors. Additionally, for images that do not use palettes, 
+the fields in the NUI header are required anyway.
 
 ### NUP payload (256 or 512 or 768 bytes)
 
