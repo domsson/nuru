@@ -92,11 +92,11 @@ typedef struct nuru_img
 	uint8_t  mdata_mode;
 	uint16_t cols;
 	uint16_t rows;
+	uint8_t  ch_key;
 	uint8_t  fg_key;
 	uint8_t  bg_key;
 	char     glyph_pal[NURU_STR_LEN];
 	char     color_pal[NURU_STR_LEN];
-	uint8_t  reserved;
 
 	nuru_cell_s *cells;
 	size_t num_cells;
@@ -108,10 +108,10 @@ typedef struct nuru_pal
 	char     signature[NURU_STR_LEN];
 	uint8_t  version;
 	uint8_t  type;
-	uint8_t  default1;
-	uint8_t  default2;
+	uint8_t  ch_key;
+	uint8_t  fg_key;
+	uint8_t  bg_key;
 	char     userdata[4];
-	uint8_t  reserved;
 
 	uint16_t codepoints[NURU_PAL_SIZE];
 }
@@ -211,11 +211,11 @@ nuru_img_load(nuru_img_s* img, const char* file)
 	success += nuru_read_int(&img->mdata_mode, 1, fp);
 	success += nuru_read_int(&img->cols, 2, fp);
 	success += nuru_read_int(&img->rows, 2, fp);
+	success += nuru_read_int(&img->ch_key, 1, fp);
 	success += nuru_read_int(&img->fg_key, 1, fp);
 	success += nuru_read_int(&img->bg_key, 1, fp);
 	success += nuru_read_str(img->glyph_pal, NURU_STR_LEN_RAW, fp);
 	success += nuru_read_str(img->color_pal, NURU_STR_LEN_RAW, fp);
-	success += nuru_read_int(&img->reserved, 1, fp);
 
 	if (success != 0)
 	{
@@ -353,10 +353,10 @@ nuru_pal_load(nuru_pal_s* pal, const char* file)
 	// read rest of header
 	success += nuru_read_int(&pal->version, 1, fp);
 	success += nuru_read_int(&pal->type, 1, fp);
-	success += nuru_read_int(&pal->default1, 1, fp);
-	success += nuru_read_int(&pal->default2, 1, fp);
+	success += nuru_read_int(&pal->ch_key, 1, fp);
+	success += nuru_read_int(&pal->fg_key, 1, fp);
+	success += nuru_read_int(&pal->bg_key, 1, fp);
 	success += nuru_read_str(pal->userdata, 4, fp);
-	success += nuru_read_int(&pal->reserved, 1, fp);
 
 	if (success != 0)
 	{
