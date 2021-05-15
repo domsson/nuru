@@ -117,7 +117,7 @@ interpretation of the data depends on the `color_mode`:
 
 The correlation of `color_mode` and the `length` is intentional.
 This also works for the palette mode if one subtracts 128 from it. 
-In other words, the highest bit, it set, indicates palette mode.
+In other words, the highest bit, if set, indicates palette mode.
 
 #### Cell data: mdata
 
