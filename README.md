@@ -185,4 +185,6 @@ The correlation of `type` and the entry size is intentional.
 
  - [pxltrm](https://github.com/dylanaraps/pxltrm)
  - [Netpbm file format](https://en.wikipedia.org/wiki/Netpbm#File_formats)
-
+ - [Glyph Drawing Club](https://github.com/hlotvonen/glyph-drawing-club/)
+ - [Moebius](https://github.com/blocktronics/moebius)
+ - [XBIN file format](https://github.com/radman1/xbin)
