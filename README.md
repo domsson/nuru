@@ -60,15 +60,16 @@ meta data.
 
 The `fg_key` and `bg_key` fields allow an application to make use of a 
 terminal's default foreground and/ or background color when displaying a cell. 
-This is being done by sacrificying two colors, one for each channel, to signify 
-"no color". This allows for transparency when displaying or combining images. 
+This is being done by sacrificying one to two colors to signify "no color". 
+This allows for transparency when displaying or combining images. 
 
 `ch_key` points at the default glyph to be used for "no glyph", which will, 
 in the majority of the cases, be `32` (the space character). Changing this to 
 a different glyph will have nuru draw spaces whenever it encounters that char. 
 
 In 8-bit color mode, colors `0` (`#000`, black) and `15` (`#fff`, white) are 
-recommended, as they both exist twice (`16` and `231`).
+recommended as `bg_key` and `fg_key` accordingly, as they both exist twice 
+(`16` and `231`).
 
 The `glyph_mode`, `color_mode` and `mdata_mode` values were designed in a way 
 that they can be directly used as buffer size for the buffers that are used to 
@@ -175,7 +176,7 @@ palette, but also the size and interpretation of each entry within the palette:
 
 | type | palette | entry size | entry interpretation                           |
 |------|---------|------------|------------------------------------------------|
-| 1    | colors  | 1          | 8 bit ANSI color                               |
+| 1    | colors  | 1          | 8 bit ANSI color (TODO: we don't need this, right?) |
 | 2    | glyphs  | 2          | Unicode code point into the Basic Multilingual Plane (Plane 0) |
 | 3    | colors  | 3          | RGB color (R, G and B channels in that order)  |
 
