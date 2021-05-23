@@ -1,4 +1,4 @@
-# nuru
+<img width="100%" src="nuru.png" alt="nuru">
 
 nuru is a file format specification for terminal drawings using ASCII or 
 Unicode characters and, optionally, colors via ANSI escape sequences or RGB. 
