@@ -14,8 +14,13 @@ suitable for use in a variety of projects, including terminal games.
 This repository contains the file format descriptions and a header-only
 C file providing data structures and functions for handling nuru files.
 
-A work-in-progress nuru image web editor is also available:
-[nuru-web](https://github.com/domsson/nuru-web/)
+## Tools and libraries
+
+Several work-in-progress tools for nuru are available:
+
+- [nuru-web](https://github.com/domsson/nuru-web/) is a nuru editor for the browser
+- [nuru-cat](https://github.com/domsson/nuru-cat/) is a nuru viewer for the terminal
+- [nuru-dot-net](https://github.com/SauceChord/nuru-dot-net) is a .NET nuru library
 
 ## Status
 
@@ -46,7 +51,7 @@ meta data.
 | offset | field       | length | type       | description                     |
 |--------|-------------|--------|------------|---------------------------------|
 | `00`   | signature   | 7      | `char`     | File signature, `4E 55 52 55 49 4D 47` (`NURUIMG`) |
-| `07`   | version     | 1      | `uint8_t`  | File format version |
+| `07`   | version     | 1      | `uint8_t`  | File format version (currently `1`) |
 | `08`   | glyph\_mode | 1      | `uint8_t`  | Glyph mode | 
 | `09`   | color\_mode | 1      | `uint8_t`  | Color mode |
 | `10`   | mdata\_mode | 1      | `uint8_t`  | Meta data mode |
@@ -143,7 +148,7 @@ in a nuru image. 16 byte header and payload of fixed length (256 entries).
 | offset | field     | length | type      | description                        |
 |--------|-----------|--------|-----------|------------------------------------|
 | `00`   | signature | 7      | `char`    | File format signature `4E 55 52 55 50 41 4C` (`NURUPAL`) |
-| `07`   | version   | 1      | `uint8_t` | File format version                |
+| `07`   | version   | 1      | `uint8_t` | File format version (currently `1`) |
 | `08`   | type      | 1      | `uint8_t` | Palette type, see below            |
 | `09`   | ch\_key   | 1      | `uint8_t` | Index of the key glyph (usually space) |
 | `10`   | fg\_key   | 1      | `uint8_t` | Index of the key foreground color  |
