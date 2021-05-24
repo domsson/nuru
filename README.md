@@ -181,7 +181,7 @@ palette, but also the size and interpretation of each entry within the palette:
 
 | type | palette | entry size | entry interpretation                           |
 |------|---------|------------|------------------------------------------------|
-| 1    | colors  | 1          | 8 bit ANSI color (TODO: we don't need this, right?) |
+| 1    | colors  | 1          | 8 bit ANSI color (useful for palette swapping) |
 | 2    | glyphs  | 2          | Unicode code point into the Basic Multilingual Plane (Plane 0) |
 | 3    | colors  | 3          | RGB color (R, G and B channels in that order)  |
 
