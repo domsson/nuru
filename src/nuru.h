@@ -10,9 +10,9 @@
 #define NURU_NAME "nuru"
 #define NURU_URL  "https://github.com/domsson/nuru"
 
-#define NURU_VER_MAJOR 0
+#define NURU_VER_MAJOR 1
 #define NURU_VER_MINOR 0
-#define NURU_VER_PATCH 1
+#define NURU_VER_PATCH 0
 
 #ifndef NURU_SCOPE
 #	define NURU_SCOPE

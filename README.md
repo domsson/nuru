@@ -22,12 +22,17 @@ Several work-in-progress tools for nuru are available:
 - [nuru-cat](https://github.com/domsson/nuru-cat/) is a nuru viewer for the terminal
 - [nuru-dot-net](https://github.com/SauceChord/nuru-dot-net) is a .NET nuru library
 
-## Status
+## Contents of this repository
 
-This is still a work in progress. Once the formats are final for their 
-initial version (1), I'll update this space to let you know.
+The README is the central piece of information, containing the nuru file 
+specification. Further, you will find the following subdirectories with 
+additional files that can aid implementation:
 
-## Files
+- `src` contains a C header file that helps with loading nuru files
+- `nui` contains some example nuru images files
+- `nup` contains some example nuru palette files
+
+# nuru file specifications
 
 Two binary file formats are being introduced:
 
