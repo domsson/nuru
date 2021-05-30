@@ -38,6 +38,9 @@
 #define NURU_ERR_FILE_READ  -4
 #define NURU_ERR_FILE_TYPE  -5
 #define NURU_ERR_FILE_MODE  -6
+#define NURU_ERR_IMG_VER    -7
+#define NURU_ERR_PAL_VER    -8
+#define NURU_ERR_PAL_TYPE   -9
 
 typedef enum nuru_glyph_mode
 {
@@ -83,6 +86,14 @@ typedef struct nuru_cell
 }
 nuru_cell_s;
 
+typedef struct nuru_rgb
+{
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+}
+nuru_rgb_s;
+
 typedef struct nuru_img
 {
 	char     signature[NURU_STR_LEN];
@@ -113,7 +124,11 @@ typedef struct nuru_pal
 	uint8_t  bg_key;
 	char     userdata[4];
 
-	uint16_t codepoints[NURU_PAL_SIZE];
+	union {
+		uint8_t  colors[NURU_PAL_SIZE];
+		uint16_t glyphs[NURU_PAL_SIZE];
+		nuru_rgb_s rgbs[NURU_PAL_SIZE];
+	} data;
 }
 nuru_pal_s;
 
@@ -130,7 +145,7 @@ NURU_SCOPE nuru_cell_s* nuru_get_cell(nuru_img_s *img, uint16_t col, uint16_t ro
 #ifdef NURU_IMPLEMENTATION
 
 NURU_SCOPE int
-nuru_read_int(void* buf, uint8_t size, FILE *fp)
+nuru_read_int(void* buf, uint8_t size, FILE* fp)
 {
 	uint16_t tmp = 0;
 	if (size > 2)
@@ -148,11 +163,28 @@ nuru_read_int(void* buf, uint8_t size, FILE *fp)
 		*(uint8_t*)(buf) = tmp;
 		return 0;
 	}
-	else
+	if (size == 2)
 	{
 		*(uint16_t*)(buf) = ntohs(tmp);
 		return 0;
 	}
+
+	return NURU_ERR_OTHER;
+}
+
+NURU_SCOPE int
+nuru_read_rgb(nuru_rgb_s* rgb, FILE* fp)
+{
+	uint32_t tmp = 0;
+	if (fread(&tmp, 1, 3, fp) != 3)
+	{
+		return NURU_ERR_FILE_READ;
+	}
+
+	rgb->r = (tmp & 0x00FF0000) >> 16;
+	rgb->g = (tmp & 0x0000FF00) >>  8;
+	rgb->b = (tmp & 0x000000FF);
+	return 0;
 }
 
 NURU_SCOPE int
@@ -164,8 +196,8 @@ nuru_read_col(uint8_t* fg, uint8_t* bg, FILE* fp)
 		return NURU_ERR_FILE_READ;
 	}
 
-	*fg = 0xF0 & tmp;
-	*bg = 0x0F & tmp;
+	*fg = (0xF0 & tmp) >> 4;
+	*bg = (0x0F & tmp);
 	return 0;
 }
 
@@ -352,10 +384,10 @@ nuru_pal_load(nuru_pal_s* pal, const char* file)
 
 	// read rest of header
 	success += nuru_read_int(&pal->version, 1, fp);
-	success += nuru_read_int(&pal->type, 1, fp);
-	success += nuru_read_int(&pal->ch_key, 1, fp);
-	success += nuru_read_int(&pal->fg_key, 1, fp);
-	success += nuru_read_int(&pal->bg_key, 1, fp);
+	success += nuru_read_int(&pal->type,    1, fp);
+	success += nuru_read_int(&pal->ch_key,  1, fp);
+	success += nuru_read_int(&pal->fg_key,  1, fp);
+	success += nuru_read_int(&pal->bg_key,  1, fp);
 	success += nuru_read_str(pal->userdata, 4, fp);
 
 	if (success != 0)
@@ -367,11 +399,36 @@ nuru_pal_load(nuru_pal_s* pal, const char* file)
 	// read payload
 	for (int i = 0; i < NURU_PAL_SIZE; ++i)
 	{
+		if (pal->type == 1)
+		{
+			//if (nuru_read_int(&pal->data[i], 1, fp) != 0)
+			if (nuru_read_int(&pal->data.colors[i], 1, fp) != 0)
+			{
+				fprintf(stderr, "huuhu");
+				//fprintf(stderr, "ch = %ls\n", pal->data.colors[i]);
+				fclose(fp);
+				return NURU_ERR_FILE_READ;
+			}
+		}
+		
+		if (pal->type == 2)
+		{
+			if (nuru_read_int(&pal->data.glyphs[i], 2, fp) != 0)
+			{
+				fprintf(stderr, "hello");
+				fprintf(stderr, "ch = %d\n", pal->data.glyphs[i]);
+				fclose(fp);
+				return NURU_ERR_FILE_READ;
+			}
+		}
+
+		/*
 		if (nuru_read_int(&pal->codepoints[i], 2, fp) != 0)
 		{
 			fclose(fp);
 			return NURU_ERR_FILE_READ;
 		}
+		*/
 	}
 
 	return 0;
