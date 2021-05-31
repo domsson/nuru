@@ -12,7 +12,7 @@
 
 #define NURU_VER_MAJOR 1
 #define NURU_VER_MINOR 0
-#define NURU_VER_PATCH 2
+#define NURU_VER_PATCH 3
 
 #ifndef NURU_SCOPE
 #	define NURU_SCOPE
