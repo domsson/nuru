@@ -12,7 +12,7 @@
 
 #define NURU_VER_MAJOR 1
 #define NURU_VER_MINOR 0
-#define NURU_VER_PATCH 0
+#define NURU_VER_PATCH 1
 
 #ifndef NURU_SCOPE
 #	define NURU_SCOPE
@@ -24,6 +24,9 @@
 
 #define NURU_IMG_SIGNATURE "NURUIMG"
 #define NURU_PAL_SIGNATURE "NURUPAL"
+
+#define NURU_IMG_FILEEXT "nui"
+#define NURU_PAL_FILEEXT "nup"
 
 #define NURU_SPACE ' '
 
@@ -264,20 +267,20 @@ nuru_img_load(nuru_img_s* img, const char* file)
 		return NURU_ERR_FILE_TYPE;
 	}
 
-	int success = 0;
-	success += nuru_read_int(&img->version, 1, fp);
-	success += nuru_read_int(&img->glyph_mode, 1, fp);
-	success += nuru_read_int(&img->color_mode, 1, fp);
-	success += nuru_read_int(&img->mdata_mode, 1, fp);
-	success += nuru_read_int(&img->cols, 2, fp);
-	success += nuru_read_int(&img->rows, 2, fp);
-	success += nuru_read_int(&img->ch_key, 1, fp);
-	success += nuru_read_int(&img->fg_key, 1, fp);
-	success += nuru_read_int(&img->bg_key, 1, fp);
-	success += nuru_read_str(img->glyph_pal, NURU_STR_LEN_RAW, fp);
-	success += nuru_read_str(img->color_pal, NURU_STR_LEN_RAW, fp);
+	int errors = 0;
+	errors += nuru_read_int(&img->version, 1, fp);
+	errors += nuru_read_int(&img->glyph_mode, 1, fp);
+	errors += nuru_read_int(&img->color_mode, 1, fp);
+	errors += nuru_read_int(&img->mdata_mode, 1, fp);
+	errors += nuru_read_int(&img->cols, 2, fp);
+	errors += nuru_read_int(&img->rows, 2, fp);
+	errors += nuru_read_int(&img->ch_key, 1, fp);
+	errors += nuru_read_int(&img->fg_key, 1, fp);
+	errors += nuru_read_int(&img->bg_key, 1, fp);
+	errors += nuru_read_str(img->glyph_pal, NURU_STR_LEN_RAW, fp);
+	errors += nuru_read_str(img->color_pal, NURU_STR_LEN_RAW, fp);
 
-	if (success != 0)
+	if (errors > 0)
 	{
 		fclose(fp);
 		return NURU_ERR_FILE_READ;
@@ -301,10 +304,10 @@ nuru_img_load(nuru_img_s* img, const char* file)
 				break;
 			case NURU_GLYPH_MODE_ASCII:
 			case NURU_GLYPH_MODE_PALETTE:
-				success += nuru_read_int(&img->cells[c].ch, 1, fp);
+				errors += nuru_read_int(&img->cells[c].ch, 1, fp);
 				break;
 			case NURU_GLYPH_MODE_UNICODE:
-				success += nuru_read_int(&img->cells[c].ch, 2, fp);
+				errors += nuru_read_int(&img->cells[c].ch, 2, fp);
 				break;
 			default:
 				fclose(fp);
@@ -318,12 +321,12 @@ nuru_img_load(nuru_img_s* img, const char* file)
 				img->cells[c].bg = 0;
 				break;
 			case NURU_COLOR_MODE_4BIT:
-				success += nuru_read_col(&img->cells[c].fg, &img->cells[c].bg, fp);
+				errors += nuru_read_col(&img->cells[c].fg, &img->cells[c].bg, fp);
 				break;
 			case NURU_COLOR_MODE_8BIT:
 			case NURU_COLOR_MODE_PALETTE:
-				success += nuru_read_int(&img->cells[c].fg, 1, fp);
-				success += nuru_read_int(&img->cells[c].bg, 1, fp);
+				errors += nuru_read_int(&img->cells[c].fg, 1, fp);
+				errors += nuru_read_int(&img->cells[c].bg, 1, fp);
 				break;
 			default:
 				fclose(fp);
@@ -336,17 +339,17 @@ nuru_img_load(nuru_img_s* img, const char* file)
 				img->cells[c].md = 0;
 				break;
 			case NURU_MDATA_MODE_1BYTE:
-				success += nuru_read_int(&img->cells[c].md, 1, fp);
+				errors += nuru_read_int(&img->cells[c].md, 1, fp);
 				break;
 			case NURU_MDATA_MODE_2BYTE:
-				success += nuru_read_int(&img->cells[c].md, 2, fp);
+				errors += nuru_read_int(&img->cells[c].md, 2, fp);
 				break;
 			default:
 				fclose(fp);
 				return NURU_ERR_FILE_MODE;
 		}
 
-		if (success != 0)
+		if (errors > 0)
 		{
 			fclose(fp);
 			return NURU_ERR_FILE_READ;
@@ -476,6 +479,7 @@ nuru_pal_load(nuru_pal_s* pal, const char* file)
 		}
 	}
 
+	fclose(fp);
 	return 0;
 }
 
