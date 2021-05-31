@@ -185,14 +185,27 @@ NURU_SCOPE int
 nuru_read_rgb(nuru_rgb_s* rgb, FILE* fp)
 {
 	uint32_t tmp = 0;
-	if (fread(&tmp, 1, 3, fp) != 3)
+
+	if (fread(&tmp, 1, 1, fp) != 1)
 	{
 		return NURU_ERR_FILE_READ;
 	}
 
-	rgb->r = (tmp & 0x00FF0000) >> 16;
-	rgb->g = (tmp & 0x0000FF00) >>  8;
-	rgb->b = (tmp & 0x000000FF);
+	rgb->r = tmp;
+
+	if (fread(&tmp, 1, 1, fp) != 1)
+	{
+		return NURU_ERR_FILE_READ;
+	}
+
+	rgb->g = tmp;
+
+	if (fread(&tmp, 1, 1, fp) != 1)
+	{
+		return NURU_ERR_FILE_READ;
+	}
+
+	rgb->b = tmp;
 	return 0;
 }
 
@@ -413,17 +426,17 @@ nuru_pal_load(nuru_pal_s* pal, const char* file)
 		return NURU_ERR_FILE_TYPE;
 	}
 
-	int success = 0;
+	int errors = 0;
 
 	// read rest of header
-	success += nuru_read_int(&pal->version, 1, fp);
-	success += nuru_read_int(&pal->type,    1, fp);
-	success += nuru_read_int(&pal->ch_key,  1, fp);
-	success += nuru_read_int(&pal->fg_key,  1, fp);
-	success += nuru_read_int(&pal->bg_key,  1, fp);
-	success += nuru_read_str(pal->userdata, 4, fp);
+	errors += nuru_read_int(&pal->version, 1, fp);
+	errors += nuru_read_int(&pal->type,    1, fp);
+	errors += nuru_read_int(&pal->ch_key,  1, fp);
+	errors += nuru_read_int(&pal->fg_key,  1, fp);
+	errors += nuru_read_int(&pal->bg_key,  1, fp);
+	errors += nuru_read_str(pal->userdata, 4, fp);
 
-	if (success != 0)
+	if (errors > 0)
 	{
 		fclose(fp);
 		return NURU_ERR_FILE_READ;
