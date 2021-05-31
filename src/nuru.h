@@ -297,6 +297,7 @@ nuru_img_load(nuru_img_s* img, const char* file)
 
 	for (size_t c = 0; c < img->num_cells; ++c)
 	{
+		img->cells[c] = (nuru_cell_s) { 0 };
 		switch (img->glyph_mode)
 		{
 			case NURU_GLYPH_MODE_NONE:
