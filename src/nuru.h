@@ -147,6 +147,9 @@ NURU_SCOPE nuru_rgb_s*  nuru_pal_get_col_rgb(nuru_pal_s *pal, uint8_t idx);
 
 #ifdef NURU_IMPLEMENTATION
 
+/*
+ * Read an integer of `size` bytes (1 or 2) into the provided buffer.
+ */
 NURU_SCOPE int
 nuru_read_int(void* buf, uint8_t size, FILE* fp)
 {
@@ -175,6 +178,9 @@ nuru_read_int(void* buf, uint8_t size, FILE* fp)
 	return NURU_ERR_OTHER;
 }
 
+/*
+ * Read an RGB color (3 bytes; R, G and B) into the provided struct.
+ */
 NURU_SCOPE int
 nuru_read_rgb(nuru_rgb_s* rgb, FILE* fp)
 {
@@ -190,11 +196,14 @@ nuru_read_rgb(nuru_rgb_s* rgb, FILE* fp)
 	return 0;
 }
 
+/*
+ * Read a 4-bit color (1 byte; 4 bits FG, 4 bits BG) into the provided vars.
+ */
 NURU_SCOPE int
 nuru_read_col(uint8_t* fg, uint8_t* bg, FILE* fp)
 {
 	uint8_t tmp = 0;
-	if (fread(&tmp, 1, 2, fp) != 2)
+	if (fread(&tmp, 1, 1, fp) != 1)
 	{
 		return NURU_ERR_FILE_READ;
 	}
@@ -204,6 +213,9 @@ nuru_read_col(uint8_t* fg, uint8_t* bg, FILE* fp)
 	return 0;
 }
 
+/*
+ * Read a string of `len` bytes into the provided buffer.
+ */
 NURU_SCOPE int
 nuru_read_str(char* buf, size_t len, FILE* fp)
 {
