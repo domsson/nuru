@@ -136,7 +136,10 @@ NURU_SCOPE int nuru_img_load(nuru_img_s *img, const char *file);
 NURU_SCOPE int nuru_img_free(nuru_img_s *img);
 NURU_SCOPE int nuru_pal_load(nuru_pal_s *pal, const char *file);
 
-NURU_SCOPE nuru_cell_s* nuru_get_cell(nuru_img_s *img, uint16_t col, uint16_t row);
+NURU_SCOPE nuru_cell_s* nuru_img_get_cell(nuru_img_s *img, uint16_t col, uint16_t row);
+NURU_SCOPE uint8_t      nuru_pal_get_col_8bit(nuru_pal_s *pal, uint8_t idx);
+NURU_SCOPE uint16_t     nuru_pal_get_glyph(nuru_pal_s *pal, uint8_t idx);
+NURU_SCOPE nuru_rgb_s*  nuru_pal_get_col_rgb(nuru_pal_s *pal, uint8_t idx);
 
 // 
 // IMPLEMENTATION
@@ -330,7 +333,7 @@ nuru_img_load(nuru_img_s* img, const char* file)
 }
 
 NURU_SCOPE nuru_cell_s*
-nuru_get_cell(nuru_img_s* img, uint16_t col, uint16_t row)
+nuru_img_get_cell(nuru_img_s* img, uint16_t col, uint16_t row)
 {
 	size_t idx = (row * img->cols) + col;
 	if (idx >= img->num_cells)
@@ -355,6 +358,24 @@ nuru_img_free(nuru_img_s* img)
 	free(img->cells);
 	img->cells = NULL;
 	return 0;
+}
+
+NURU_SCOPE uint8_t
+nuru_pal_get_col_8bit(nuru_pal_s* pal, uint8_t idx)
+{
+	return pal->data.colors[idx];
+}
+
+NURU_SCOPE uint16_t
+nuru_pal_get_glyph(nuru_pal_s* pal, uint8_t idx)
+{
+	return pal->data.glyphs[idx];
+}
+
+NURU_SCOPE nuru_rgb_s*
+nuru_pal_get_col_rgb(nuru_pal_s* pal, uint8_t idx)
+{
+	return &pal->data.rgbs[idx];
 }
 
 NURU_SCOPE int
@@ -399,36 +420,35 @@ nuru_pal_load(nuru_pal_s* pal, const char* file)
 	// read payload
 	for (int i = 0; i < NURU_PAL_SIZE; ++i)
 	{
-		if (pal->type == 1)
+		if (pal->type == NURU_PAL_TYPE_COLOR_8BIT)
 		{
-			//if (nuru_read_int(&pal->data[i], 1, fp) != 0)
 			if (nuru_read_int(&pal->data.colors[i], 1, fp) != 0)
 			{
-				fprintf(stderr, "huuhu");
-				//fprintf(stderr, "ch = %ls\n", pal->data.colors[i]);
+				fprintf(stderr, "failed reading 8bit color\n");
 				fclose(fp);
 				return NURU_ERR_FILE_READ;
 			}
 		}
 		
-		if (pal->type == 2)
+		if (pal->type == NURU_PAL_TYPE_GLYPH_UNICODE)
 		{
 			if (nuru_read_int(&pal->data.glyphs[i], 2, fp) != 0)
 			{
-				fprintf(stderr, "hello");
-				fprintf(stderr, "ch = %d\n", pal->data.glyphs[i]);
+				fprintf(stderr, "failed reading glyph\n");
 				fclose(fp);
 				return NURU_ERR_FILE_READ;
 			}
 		}
 
-		/*
-		if (nuru_read_int(&pal->codepoints[i], 2, fp) != 0)
+		if (pal->type == NURU_PAL_TYPE_COLOR_RGB)
 		{
-			fclose(fp);
-			return NURU_ERR_FILE_READ;
+			if (nuru_read_rgb(&pal->data.rgbs[i], fp) != 0)
+			{
+				fprintf(stderr, "failed reading RGB\n");
+				fclose(fp);
+				return NURU_ERR_FILE_READ;
+			}
 		}
-		*/
 	}
 
 	return 0;
