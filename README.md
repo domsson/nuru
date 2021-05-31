@@ -199,3 +199,8 @@ The correlation of `type` and the entry size is intentional.
  - [Glyph Drawing Club](https://github.com/hlotvonen/glyph-drawing-club/)
  - [Moebius](https://github.com/blocktronics/moebius)
  - [XBIN file format](https://github.com/radman1/xbin)
+
+## Support
+
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L22BUD8)
+
