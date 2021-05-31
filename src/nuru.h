@@ -12,7 +12,7 @@
 
 #define NURU_VER_MAJOR 1
 #define NURU_VER_MINOR 0
-#define NURU_VER_PATCH 1
+#define NURU_VER_PATCH 2
 
 #ifndef NURU_SCOPE
 #	define NURU_SCOPE
@@ -452,7 +452,6 @@ nuru_pal_load(nuru_pal_s* pal, const char* file)
 		{
 			if (nuru_read_int(&pal->data.colors[i], 1, fp) != 0)
 			{
-				fprintf(stderr, "failed reading 8bit color\n");
 				fclose(fp);
 				return NURU_ERR_FILE_READ;
 			}
@@ -462,7 +461,6 @@ nuru_pal_load(nuru_pal_s* pal, const char* file)
 		{
 			if (nuru_read_int(&pal->data.glyphs[i], 2, fp) != 0)
 			{
-				fprintf(stderr, "failed reading glyph\n");
 				fclose(fp);
 				return NURU_ERR_FILE_READ;
 			}
@@ -472,7 +470,6 @@ nuru_pal_load(nuru_pal_s* pal, const char* file)
 		{
 			if (nuru_read_rgb(&pal->data.rgbs[i], fp) != 0)
 			{
-				fprintf(stderr, "failed reading RGB\n");
 				fclose(fp);
 				return NURU_ERR_FILE_READ;
 			}
